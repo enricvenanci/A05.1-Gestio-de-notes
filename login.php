@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión</title>
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <main class="login-page">
@@ -14,6 +14,10 @@
             </div>
 
             <div class="login-content">
+                <p class="eyebrow">GESTIÓN DE NOTAS</p>
+                <h1>Bienvenido de nuevo</h1>
+                <p class="welcome-text">Accede a tu cuenta para continuar.</p>
+
                 <form class="login-form">
                     <div class="form-field">
                         <label for="username">Nombre</label>
@@ -25,7 +29,7 @@
                         <input type="password" id="password" name="password">
                     </div>
 
-                    <button type="button">INICIAR SESIÓN</button>
+                    <button type="button">Iniciar sesión <span aria-hidden="true">→</span></button>
                 </form>
 
                 <p class="register-text">
