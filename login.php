@@ -33,7 +33,7 @@
                 </form>
 
                 <p class="register-text">
-                    No tienes cuenta? <a href="#">Regístrate aquí</a>
+                    No tienes cuenta? <a href="register.php">Regístrate aquí</a>
                 </p>
             </div>
         </section>

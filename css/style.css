@@ -45,6 +45,11 @@ body {
     box-shadow: 0 24px 70px rgba(37, 57, 91, 0.14);
 }
 
+.register-card {
+    grid-template-columns: minmax(240px, 0.8fr) minmax(380px, 1.2fr);
+    max-width: 930px;
+}
+
 .brand {
     position: relative;
     display: flex;
@@ -78,6 +83,11 @@ body {
     padding: 64px clamp(36px, 7vw, 78px);
 }
 
+.register-content {
+    padding-top: 52px;
+    padding-bottom: 52px;
+}
+
 .eyebrow {
     margin: 0 0 14px;
     color: var(--blue);
@@ -105,6 +115,10 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.register-form {
+    gap: 14px;
 }
 
 .form-field label {
@@ -188,6 +202,10 @@ button:hover {
         min-height: 0;
     }
 
+    .register-card {
+        max-width: 440px;
+    }
+
     .brand {
         min-height: 220px;
         padding: 32px;
@@ -204,5 +222,10 @@ button:hover {
 
     .login-content {
         padding: 40px 32px 42px;
+    }
+
+    .register-content {
+        padding-top: 40px;
+        padding-bottom: 42px;
     }
 }
