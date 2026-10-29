@@ -48,7 +48,7 @@
                 </form>
 
                 <p class="register-text">
-                    ¿Ya tienes cuenta? <a href="login.php">Inicia sesión aquí</a>
+                    ¿Ya tienes cuenta? <a href="index.php">Inicia sesión aquí</a>
                 </p>
             </div>
         </section>
