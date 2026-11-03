@@ -18,33 +18,33 @@
                 <h1>Crea tu cuenta</h1>
                 <p class="welcome-text">Completa tus datos para registrarte.</p>
 
-                <form class="login-form register-form">
+                <form class="login-form register-form" method="post" action="proc/proc_register.php">
                     <div class="form-field">
                         <label for="full-name">Nombre y apellidos</label>
-                        <input type="text" id="full-name" name="full-name">
+                        <input type="text" id="full-name" name="full_name" required>
                     </div>
 
                     <div class="form-field">
                         <label for="school-email">Correo de la escuela</label>
-                        <input type="text" id="school-email" name="school-email">
+                        <input type="email" id="school-email" name="email" required>
                     </div>
 
                     <div class="form-field">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password">
+                        <input type="password" id="password" name="password" required>
                     </div>
 
                     <div class="form-field">
                         <label for="confirm-password">Confirma contraseña</label>
-                        <input type="password" id="confirm-password" name="confirm-password">
+                        <input type="password" id="confirm-password" name="confirm_password" required>
                     </div>
 
                     <div class="form-field">
                         <label for="role">Rol</label>
-                        <input type="text" id="role" name="role">
+                        <input type="text" id="role" name="role" value="admin" required>
                     </div>
 
-                    <button type="button">Registrarse <span aria-hidden="true">→</span></button>
+                    <button type="submit">Registrarse <span aria-hidden="true">→</span></button>
                 </form>
 
                 <p class="register-text">
