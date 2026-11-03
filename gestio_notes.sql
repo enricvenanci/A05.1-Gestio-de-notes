@@ -58,3 +58,21 @@ CREATE TABLE notas (
     FOREIGN KEY (alumno_id)     REFERENCES alumnos(id)     ON DELETE CASCADE,
     FOREIGN KEY (asignatura_id) REFERENCES asignaturas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+INSERT INTO roles (nombre) VALUES ('admin');
+
+INSERT INTO usuarios (
+    nombre,
+    apellidos,
+    email,
+    password_hash,
+    rol_id
+)
+SELECT
+    'Usuario',
+    'Prueba',
+    'usuario.prueba@example.com',
+    '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi',
+    id
+FROM roles
+WHERE nombre = 'admin';
