@@ -3,7 +3,7 @@
  $servername = "localhost:3306"; // Nombre del servidor 
  $dbusername = "root"; // Nombre de usuario 
  $dbpassword = ""; // Contraseña 
- $dbname = "gestio_notas"; // Nombre de la base de datos 
+ $dbname = "gestio_notes"; // Nombre de la base de datos 
  
  // ---------------------------------------------------------------------- 
  // PDO: ESTABLECER CONEXIÓN CONTROLANDO ERRORES 
