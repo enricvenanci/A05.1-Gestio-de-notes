@@ -111,6 +111,32 @@ h1 {
     font-size: 14px;
 }
 
+.form-error {
+    margin: 0 0 18px;
+    color: #b42318;
+    font-size: 13px;
+}
+
+.logout-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    border-radius: 11px;
+    background: var(--navy);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.logout-link:hover {
+    background: #263a5e;
+    transform: translateY(-1px);
+}
+
 .login-form {
     display: flex;
     flex-direction: column;
