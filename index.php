@@ -17,8 +17,7 @@
                 <p class="eyebrow">GESTIÓN DE NOTAS</p>
                 <h1>Bienvenido de nuevo</h1>
                 <p class="welcome-text">Accede a tu cuenta para continuar.</p>
-                                <!-- proceso en de login -->
-                <form class="login-form" method="post" action="../proc/proc_login.php" aria-label="Formulario de inicio de sesión">
+                <form class="login-form" method="post" action="proc/proc_login.php" aria-label="Formulario de inicio de sesión">
                     <div class="form-field">
                         <label for="username">Nombre</label>
                         <input type="text" id="username" name="username" required>

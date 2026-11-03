@@ -2,11 +2,11 @@
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
-require_once __DIR__ . '/conexion/conexion.php';
+require_once __DIR__ . '/../conexion/conexion.php';
 
 $username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
@@ -29,9 +29,9 @@ if ($user && password_verify($password, $user['password_hash'])) {
     $_SESSION['user_name'] = $user['nombre'];
     $_SESSION['user_full_name'] = $user['nombre'] . ' ' . $user['apellidos'];
 
-    header('Location: bienvenida.php');
+    header('Location: ../bienvenida.php');
     exit;
 }
 
-header('Location: index.php');
+header('Location: ../index.php');
 exit;
