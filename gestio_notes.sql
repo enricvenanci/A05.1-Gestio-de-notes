@@ -1,6 +1,14 @@
+-- =====================================================
+-- GESTIO-NOTES · Base de datos
+-- Estructura: ciclos -> cursos -> asignaturas / alumnos -> notas
+-- Requisito: MySQL 8.0.16+ o MariaDB 10.2+ (para el CHECK de la nota)
+-- =====================================================
+
 DROP DATABASE IF EXISTS gestio_notes;
 CREATE DATABASE gestio_notes CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE gestio_notes;
+
+-- ---------- TABLAS ----------
 
 -- Roles de usuario (hoy solo admin; escalable a profesor, tutor...)
 CREATE TABLE roles (
@@ -86,12 +94,26 @@ JOIN ciclos ci ON ci.id = c.ciclo_id;
 
 -- ---------- DATOS ----------
 
-INSERT INTO roles (id, nombre) VALUES (1, 'admin');
+-- Cargos de los gestores de notas (se muestran junto al nombre tras el login)
+INSERT INTO roles (id, nombre) VALUES
+(1, 'admin'),
+(2, 'profesor'),
+(3, 'educador'),
+(4, 'secretaria');
 
--- Login de prueba: usuario.prueba@example.com
+-- Gestores de notas (profesores, educadores, secretaría...)
+-- Todos comparten el mismo hash que el usuario de prueba (misma contraseña)
 INSERT INTO usuarios (nombre, apellidos, email, password_hash, rol_id) VALUES
-('Usuario', 'Prueba', 'usuario.prueba@example.com',
- '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 1);
+('Usuario', 'Prueba',  'usuario.prueba@example.com',
+ '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 1),
+('Carles',  'Vidal Ferrer', 'carles.vidal@example.com',
+ '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 2),
+('Montse',  'Casals Prats', 'montse.casals@example.com',
+ '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 2),
+('Albert',  'Soler Mir',    'albert.soler@example.com',
+ '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 3),
+('Marta',   'Pons Riera',   'marta.pons@example.com',
+ '$2y$12$FYUWv/gl6sqqh1ugCZXSaueGIiu1GRX6OGP2/4IKih8Dqaf4430Qi', 4);
 
 INSERT INTO ciclos (id, nombre) VALUES
 (1, 'Desarrollo de Aplicaciones Web (DAW)'),
