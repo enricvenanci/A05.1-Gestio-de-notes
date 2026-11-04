@@ -1,10 +1,6 @@
 <?php
 session_start();
 
-/**
- * Comprueba que la petición viene de la página indicada.
- * Si el navegador no envía Referer se permite, porque no se puede comprobar.
- */
 function viene_de(string $pagina): bool
 {
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
