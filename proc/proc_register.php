@@ -21,15 +21,57 @@ $confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confir
     : '';
 $roleId = filter_var($_POST['role_id'] ?? '', FILTER_VALIDATE_INT);
 
-if (
-    $nombre === '' ||
-    $apellidos === '' ||
-    !filter_var($email, FILTER_VALIDATE_EMAIL) ||
-    $password === '' ||
-    $password !== $confirmPassword ||
-    $roleId === false
-) {
-    error('Completa todos los campos correctamente y asegúrate de que las contraseñas coincidan.');
+// ---------- Nombre ----------
+if ($nombre === '') {
+    error('El nombre es obligatorio.');
+}
+if (mb_strlen($nombre) < 2) {
+    error('El nombre debe tener al menos 2 letras.');
+}
+if (preg_match('/[0-9]/', $nombre)) {
+    error('El nombre no puede contener números.');
+}
+
+// ---------- Apellidos ----------
+if ($apellidos === '') {
+    error('Los apellidos son obligatorios.');
+}
+if (mb_strlen($apellidos) < 2) {
+    error('Los apellidos deben tener al menos 2 letras.');
+}
+if (preg_match('/[0-9]/', $apellidos)) {
+    error('Los apellidos no pueden contener números.');
+}
+
+// ---------- Correo ----------
+if ($email === '') {
+    error('El correo es obligatorio.');
+}
+// Mismo formato que en JavaScript: texto @ texto . al menos 2 letras
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)) {
+    error('El correo electrónico no es válido.');
+}
+
+// ---------- Contraseña ----------
+if ($password === '') {
+    error('La contraseña es obligatoria.');
+}
+if (preg_match_all('/\p{L}/u', $password) < 2) {
+    error('La contraseña debe tener al menos 2 letras.');
+}
+if (!preg_match('/\p{Lu}/u', $password)) {
+    error('La contraseña debe tener al menos 1 mayúscula.');
+}
+if (!preg_match('/[0-9]/', $password)) {
+    error('La contraseña debe tener al menos 1 número.');
+}
+if ($password !== $confirmPassword) {
+    error('Las contraseñas no coinciden.');
+}
+
+// ---------- Rol ----------
+if ($roleId === false) {
+    error('Selecciona un rol.');
 }
 
 $roleStmt = $conn->prepare('SELECT id FROM roles WHERE id = ?');
