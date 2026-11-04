@@ -1,14 +1,7 @@
--- =====================================================
--- GESTIO-NOTES · Base de datos
--- Estructura: ciclos -> cursos -> asignaturas / alumnos -> notas
--- Requisito: MySQL 8.0.16+ o MariaDB 10.2+ (para el CHECK de la nota)
--- =====================================================
 
 DROP DATABASE IF EXISTS gestio_notes;
 CREATE DATABASE gestio_notes CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE gestio_notes;
-
--- ---------- TABLAS ----------
 
 -- Roles de usuario (hoy solo admin; escalable a profesor, tutor...)
 CREATE TABLE roles (
@@ -75,9 +68,8 @@ CREATE TABLE notas (
     FOREIGN KEY (asignatura_id) REFERENCES asignaturas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ---------- VISTA PARA EL LISTADO Y LOS FILTROS ----------
--- Une alumno + curso + ciclo en una sola consulta sencilla:
---   SELECT * FROM vista_alumnos WHERE ciclo_id = ? AND curso_id = ?
+-- SELECT para la tabla de los alumnos
+
 CREATE VIEW vista_alumnos AS
 SELECT
     a.id,
@@ -92,7 +84,6 @@ FROM alumnos a
 JOIN cursos c  ON c.id  = a.curso_id
 JOIN ciclos ci ON ci.id = c.ciclo_id;
 
--- ---------- DATOS ----------
 
 -- Cargos de los gestores de notas (se muestran junto al nombre tras el login)
 INSERT INTO roles (id, nombre) VALUES
