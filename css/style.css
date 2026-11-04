@@ -6,7 +6,7 @@
     --muted: #78839a;
     --border: #e2e7f0;
     --surface: #ffffff;
-    --background: #f3f6fb;
+    --background: #ffffff;
 }
 
 * {
@@ -18,10 +18,7 @@ body {
     min-height: 100vh;
     margin: 0;
     color: var(--navy);
-    background:
-        radial-gradient(circle at 8% 12%, rgba(119, 147, 234, 0.18), transparent 28%),
-        radial-gradient(circle at 90% 92%, rgba(191, 157, 87, 0.14), transparent 25%),
-        var(--background);
+    background: var(--background);
     font-family: 'DM Sans', Arial, sans-serif;
 }
 
