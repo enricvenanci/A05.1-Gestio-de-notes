@@ -20,15 +20,17 @@
                 <form class="login-form" method="post" action="proc/proc_login.php" aria-label="Formulario de inicio de sesión">
                     <div class="form-field">
                         <label for="username">Nombre</label>
-                        <input type="text" id="username" name="username" required>
+                        <input type="text" id="username" name="username" onblur="comprobarUsuario()">
+                        <span id="error-username"></span>
                     </div>
 
                     <div class="form-field">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="password" name="password" onblur="comprobarPassword()">
+                        <span id="error-password"></span>
                     </div>
 
-                    <button type="submit">Iniciar sesión <span aria-hidden="true">→</span></button>
+                    <button type="submit" onclick="return validarLogin()">Iniciar sesión <span aria-hidden="true">→</span></button>
                 </form>
 
                 <p class="register-text">
@@ -37,5 +39,6 @@
             </div>
         </section>
     </main>
+    <script src="javascript/validacion.js"></script>
 </body>
 </html>
