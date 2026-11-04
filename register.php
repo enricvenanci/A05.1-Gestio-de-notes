@@ -39,7 +39,7 @@
 
                     <div class="form-field">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" onblur="comprobarPassword()">
+                        <input type="password" id="password" name="password" onblur="comprobarPasswordRegistro()">
                         <span id="error-password"></span>
                     </div>
 
