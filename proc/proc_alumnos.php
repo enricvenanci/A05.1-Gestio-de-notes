@@ -47,7 +47,7 @@ if ($id <= 0) {
     exit;
 }
 
-require_once __DIR__ . '/../conexion/conexion.php';
+include '../conexion/conexion.php';
 
 try {
     $stmt = $conn->prepare('SELECT nombre, apellidos FROM alumnos WHERE id = :id LIMIT 1');

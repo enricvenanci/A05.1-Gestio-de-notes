@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../conexion/conexion.php';
+include '../conexion/conexion.php';
 
 function error(string $mensaje): void
 {

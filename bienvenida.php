@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'], $_SESSION['user_name'])) {
     exit;
 }
  
-require_once __DIR__ . '/conexion/conexion.php';
+include 'conexion/conexion.php';
  
 $userName = $_SESSION['user_name'];
  
@@ -15,13 +15,8 @@ $userName = $_SESSION['user_name'];
 $mensaje = $_SESSION['flash_ok'] ?? null;
 $error   = $_SESSION['flash_error'] ?? null;
 unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
- 
-// Todos los alumnos con su ciclo y curso (vista definida en gestio_notes.sql)
-$alumnos = $conn->query(
-    'SELECT id, nombre, apellidos, email, ciclo, curso
-     FROM vista_alumnos
-     ORDER BY ciclo, curso, apellidos, nombre'
-)->fetchAll(PDO::FETCH_ASSOC);
+
+include 'filtros/consultar_alumnos.php';
  
 function e(?string $valor): string
 {
@@ -68,6 +63,39 @@ function e(?string $valor): string
             <?php if ($error): ?>
                 <div class="msg error" role="alert"><?= e($error) ?></div>
             <?php endif; ?>
+
+            <!-- Barra para buscar alumnos por nombre o apellidos. -->
+            <form class="filters" id="filtros-alumnos" method="get">
+                <div class="filters__field filters__field--grow search" id="filtro-nombre">
+                    <label class="filters__label" for="nombre">Buscar alumno</label>
+                    <input class="input" type="search" id="nombre" name="nombre" placeholder="Busca por nombre..." value="<?= e($nombre) ?>">
+                </div>
+                <!-- Selector para filtrar alumnos por curso. -->
+                <div class="filters__field" id="filtro-curso">
+                    <label class="filters__label" for="curso">Curso</label>
+                    <select class="select" id="curso" name="curso">
+                        <option value="">Todos los cursos</option>
+                        <?php foreach ($cursos as $curso) { ?>
+                            <option value="<?= e($curso) ?>" <?= $cursoSeleccionado === $curso ? 'selected' : '' ?>>
+                                <?= e($curso) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <!-- Selector para filtrar alumnos por ciclo. -->
+                <div class="filters__field" id="filtro-ciclo">
+                    <label class="filters__label" for="ciclo">Ciclo</label>
+                    <select class="select" id="ciclo" name="ciclo">
+                        <option value="">Todos los ciclos</option>
+                        <?php foreach ($ciclos as $ciclo) { ?>
+                            <option value="<?= e($ciclo) ?>" <?= $cicloSeleccionado === $ciclo ? 'selected' : '' ?>>
+                                <?= e($ciclo) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <button class="btn-primary" id="btn-filtrar" type="submit">Filtrar</button>
+            </form>
  
             <section class="card">
                 <div class="card__head">
@@ -75,7 +103,7 @@ function e(?string $valor): string
                 </div>
  
                 <?php if (!$alumnos): ?>
-                    <p class="empty">No hay alumnos registrados.</p>
+                    <p class="empty"><?= $nombre !== '' || $cursoSeleccionado !== '' || $cicloSeleccionado !== '' ? 'No hay alumnos que coincidan con los filtros.' : 'No hay alumnos registrados.' ?></p>
                 <?php else: ?>
                     <div class="table-wrap">
                         <table class="table">
