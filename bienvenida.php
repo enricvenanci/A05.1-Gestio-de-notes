@@ -15,13 +15,8 @@ $userName = $_SESSION['user_name'];
 $mensaje = $_SESSION['flash_ok'] ?? null;
 $error   = $_SESSION['flash_error'] ?? null;
 unset($_SESSION['flash_ok'], $_SESSION['flash_error']);
- 
-// Todos los alumnos con su ciclo y curso (vista definida en gestio_notes.sql)
-$alumnos = $conn->query(
-    'SELECT id, nombre, apellidos, email, ciclo, curso
-     FROM vista_alumnos
-     ORDER BY ciclo, curso, apellidos, nombre'
-)->fetchAll(PDO::FETCH_ASSOC);
+
+require_once __DIR__ . '/filtros/consultar_alumnos.php';
  
 function e(?string $valor): string
 {
@@ -68,6 +63,15 @@ function e(?string $valor): string
             <?php if ($error): ?>
                 <div class="msg error" role="alert"><?= e($error) ?></div>
             <?php endif; ?>
+
+            <!-- Barra para buscar alumnos por nombre o apellidos. -->
+            <form class="filters" method="get">
+                <div class="filters__field filters__field--grow search">
+                    <label class="filters__label" for="nombre">Buscar alumno</label>
+                    <input class="input" type="search" id="nombre" name="nombre" placeholder="Busca por nombre..." value="<?= e($nombre) ?>">
+                </div>
+                <button class="btn-primary" type="submit">Buscar</button>
+            </form>
  
             <section class="card">
                 <div class="card__head">
@@ -75,7 +79,7 @@ function e(?string $valor): string
                 </div>
  
                 <?php if (!$alumnos): ?>
-                    <p class="empty">No hay alumnos registrados.</p>
+                    <p class="empty"><?= $nombre !== '' ? 'No hay alumnos que coincidan con la búsqueda.' : 'No hay alumnos registrados.' ?></p>
                 <?php else: ?>
                     <div class="table-wrap">
                         <table class="table">
