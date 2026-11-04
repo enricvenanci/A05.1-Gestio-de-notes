@@ -82,6 +82,18 @@ function e(?string $valor): string
                         <?php } ?>
                     </select>
                 </div>
+                <!-- Selector para filtrar alumnos por ciclo. -->
+                <div class="filters__field">
+                    <label class="filters__label" for="ciclo">Ciclo</label>
+                    <select class="select" id="ciclo" name="ciclo">
+                        <option value="">Todos los ciclos</option>
+                        <?php foreach ($ciclos as $ciclo) { ?>
+                            <option value="<?= e($ciclo) ?>" <?= $cicloSeleccionado === $ciclo ? 'selected' : '' ?>>
+                                <?= e($ciclo) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
                 <button class="btn-primary" type="submit">Filtrar</button>
             </form>
  
@@ -91,7 +103,7 @@ function e(?string $valor): string
                 </div>
  
                 <?php if (!$alumnos): ?>
-                    <p class="empty"><?= $nombre !== '' || $cursoSeleccionado !== '' ? 'No hay alumnos que coincidan con los filtros.' : 'No hay alumnos registrados.' ?></p>
+                    <p class="empty"><?= $nombre !== '' || $cursoSeleccionado !== '' || $cicloSeleccionado !== '' ? 'No hay alumnos que coincidan con los filtros.' : 'No hay alumnos registrados.' ?></p>
                 <?php else: ?>
                     <div class="table-wrap">
                         <table class="table">
