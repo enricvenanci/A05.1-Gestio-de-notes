@@ -70,7 +70,19 @@ function e(?string $valor): string
                     <label class="filters__label" for="nombre">Buscar alumno</label>
                     <input class="input" type="search" id="nombre" name="nombre" placeholder="Busca por nombre..." value="<?= e($nombre) ?>">
                 </div>
-                <button class="btn-primary" type="submit">Buscar</button>
+                <!-- Selector para filtrar alumnos por curso. -->
+                <div class="filters__field">
+                    <label class="filters__label" for="curso">Curso</label>
+                    <select class="select" id="curso" name="curso">
+                        <option value="">Todos los cursos</option>
+                        <?php foreach ($cursos as $curso) { ?>
+                            <option value="<?= e($curso) ?>" <?= $cursoSeleccionado === $curso ? 'selected' : '' ?>>
+                                <?= e($curso) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <button class="btn-primary" type="submit">Filtrar</button>
             </form>
  
             <section class="card">
@@ -79,7 +91,7 @@ function e(?string $valor): string
                 </div>
  
                 <?php if (!$alumnos): ?>
-                    <p class="empty"><?= $nombre !== '' ? 'No hay alumnos que coincidan con la búsqueda.' : 'No hay alumnos registrados.' ?></p>
+                    <p class="empty"><?= $nombre !== '' || $cursoSeleccionado !== '' ? 'No hay alumnos que coincidan con los filtros.' : 'No hay alumnos registrados.' ?></p>
                 <?php else: ?>
                     <div class="table-wrap">
                         <table class="table">
