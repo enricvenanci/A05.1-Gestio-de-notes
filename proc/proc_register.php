@@ -1,20 +1,10 @@
 <?php
-session_start();
 require_once __DIR__ . '/../conexion/conexion.php';
 
-function redirectToRegister(string $error): never
+function error(string $mensaje): void
 {
-    $_SESSION['register_error'] = $error;
-    header('Location: ../register.php');
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['roles'])) {
-    header('Content-Type: application/json; charset=utf-8');
-
-    $roleStmt = $conn->query('SELECT id, nombre FROM roles ORDER BY nombre');
-    echo json_encode($roleStmt->fetchAll(PDO::FETCH_ASSOC), JSON_THROW_ON_ERROR);
-    exit;
+    http_response_code(400);
+    exit(htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') . '<br><a href="../register.php">Volver</a>');
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -22,49 +12,91 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$nombre = trim($_POST['nombre'] ?? '');
-$apellidos = trim($_POST['apellidos'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$password = $_POST['password'] ?? '';
-$confirmPassword = $_POST['confirm_password'] ?? '';
-$roleId = filter_input(INPUT_POST, 'role_id', FILTER_VALIDATE_INT);
+$nombre = isset($_POST['nombre']) && is_string($_POST['nombre']) ? trim($_POST['nombre']) : '';
+$apellidos = isset($_POST['apellidos']) && is_string($_POST['apellidos']) ? trim($_POST['apellidos']) : '';
+$email = isset($_POST['email']) && is_string($_POST['email']) ? trim($_POST['email']) : '';
+$password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST['password'] : '';
+$confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])
+    ? $_POST['confirm_password']
+    : '';
+$roleId = filter_var($_POST['role_id'] ?? '', FILTER_VALIDATE_INT);
 
-if (
-    $nombre === '' ||
-    $apellidos === '' ||
-    !filter_var($email, FILTER_VALIDATE_EMAIL) ||
-    $password === '' ||
-    $password !== $confirmPassword ||
-    $roleId === false ||
-    $roleId === null
-) {
-    redirectToRegister('Completa todos los campos correctamente y asegúrate de que las contraseñas coincidan.');
+// ---------- Nombre ----------
+if ($nombre === '') {
+    error('El nombre es obligatorio.');
+}
+if (mb_strlen($nombre) < 2) {
+    error('El nombre debe tener al menos 2 letras.');
+}
+if (preg_match('/[0-9]/', $nombre)) {
+    error('El nombre no puede contener números.');
 }
 
-$roleStmt = $conn->prepare('SELECT id FROM roles WHERE id = :id LIMIT 1');
-$roleStmt->execute(['id' => $roleId]);
-$existingRoleId = $roleStmt->fetchColumn();
+// ---------- Apellidos ----------
+if ($apellidos === '') {
+    error('Los apellidos son obligatorios.');
+}
+if (mb_strlen($apellidos) < 2) {
+    error('Los apellidos deben tener al menos 2 letras.');
+}
+if (preg_match('/[0-9]/', $apellidos)) {
+    error('Los apellidos no pueden contener números.');
+}
 
-if ($existingRoleId === false) {
-    redirectToRegister('El rol seleccionado no existe.');
+// ---------- Correo ----------
+if ($email === '') {
+    error('El correo es obligatorio.');
+}
+// Mismo formato que en JavaScript: texto @ texto . al menos 2 letras
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)) {
+    error('El correo electrónico no es válido.');
+}
+
+// ---------- Contraseña ----------
+if ($password === '') {
+    error('La contraseña es obligatoria.');
+}
+if (preg_match_all('/\p{L}/u', $password) < 2) {
+    error('La contraseña debe tener al menos 2 letras.');
+}
+if (!preg_match('/\p{Lu}/u', $password)) {
+    error('La contraseña debe tener al menos 1 mayúscula.');
+}
+if (!preg_match('/[0-9]/', $password)) {
+    error('La contraseña debe tener al menos 1 número.');
+}
+if ($password !== $confirmPassword) {
+    error('Las contraseñas no coinciden.');
+}
+
+// ---------- Rol ----------
+if ($roleId === false) {
+    error('Selecciona un rol.');
+}
+
+$roleStmt = $conn->prepare('SELECT id FROM roles WHERE id = ?');
+$roleStmt->execute([$roleId]);
+$roleId = $roleStmt->fetchColumn();
+
+if ($roleId === false) {
+    error('El rol seleccionado no existe.');
 }
 
 $userStmt = $conn->prepare(
-    'INSERT INTO usuarios (nombre, apellidos, email, password_hash, rol_id)
-     VALUES (:nombre, :apellidos, :email, :password_hash, :rol_id)'
+    'INSERT INTO usuarios (nombre, apellidos, email, password_hash, rol_id) VALUES (?, ?, ?, ?, ?)'
 );
 
 try {
     $userStmt->execute([
-        'nombre' => $nombre,
-        'apellidos' => $apellidos,
-        'email' => $email,
-        'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-        'rol_id' => $existingRoleId,
+        $nombre,
+        $apellidos,
+        $email,
+        password_hash($password, PASSWORD_DEFAULT),
+        $roleId,
     ]);
 } catch (PDOException $exception) {
-    if ($exception->errorInfo[1] === 1062) {
-        redirectToRegister('El correo electrónico ya está registrado.');
+    if (($exception->errorInfo[1] ?? null) === 1062) {
+        error('El correo electrónico ya está registrado.');
     }
 
     throw $exception;
