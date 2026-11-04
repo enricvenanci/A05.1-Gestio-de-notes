@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once __DIR__ . '/../conexion/conexion.php';
+include '../conexion/conexion.php';
 
 $username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
