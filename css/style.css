@@ -439,43 +439,46 @@ p {
 }
 
 /* Panel de filtros */
-.filters {
+#filtros-alumnos {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 18px;
-    padding: 18px 20px;
+    padding: 14px 18px;
     border-radius: 12px;
     background: var(--cream-dark);
 }
 
-.filters__field {
+#filtro-nombre,
+#filtro-curso,
+#filtro-ciclo {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-.filters__field--grow {
+#filtro-nombre {
     flex: 1 1 220px;
 }
 
-.filters__label {
+#filtros-alumnos .filters__label {
     color: var(--text);
     font-size: 11px;
 }
 
-.filters .select {
+#curso,
+#ciclo {
     min-width: 170px;
 }
 
-.filters .input,
-.filters .select {
+#filtros-alumnos .input,
+#filtros-alumnos .select {
     background-color: var(--surface);
 }
 
 /* Buscador con lupa */
-.search .input {
+#nombre {
     padding-left: 36px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a867b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -642,16 +645,17 @@ p {
 }
 
 @media (max-width: 560px) {
-    .filters {
+    #filtros-alumnos {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .filters .select {
+    #curso,
+    #ciclo {
         min-width: 0;
     }
 
-    .filters .btn-primary {
+    #btn-filtrar {
         width: 100%;
     }
 
@@ -659,5 +663,3 @@ p {
         padding: 20px 18px 16px;
     }
 }
-
-
