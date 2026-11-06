@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'], $_SESSION['user_name'])) {
 include 'conexion/conexion.php';
  
 $userName = $_SESSION['user_name'];
+$userRole = $_SESSION['user_role'] ?? '';
  
 // Mensajes que deja proc/proc_alumnos.php
 $mensaje = $_SESSION['flash_ok'] ?? null;
@@ -46,7 +47,7 @@ function e(?string $valor): string
  
             <header class="topbar">
                 <span></span>
-                <span class="user-pill"><?= e($userName) ?></span>
+                <span class="user-pill"><?= e($userName) ?><?php if ($userRole !== ''): ?> <span class="user-pill__role"><?= e(ucfirst($userRole)) ?></span><?php endif; ?></span>
             </header>
  
             <div class="page-header">

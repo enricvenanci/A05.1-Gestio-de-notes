@@ -17,6 +17,7 @@ include_once('./conexion/conexion.php');
  
 // Nombre del usuario que ha hecho login (el de la cabecera)
 $userName = htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8');
+$userRole = htmlspecialchars(ucfirst($_SESSION['user_role'] ?? ''), ENT_QUOTES, 'UTF-8');
  
 // Id del alumno que viene del listado. Con (int) nos aseguramos de que es un número
 $idAlumno = (int) $_GET['idAlumno'];
@@ -101,7 +102,7 @@ $etiquetaCurso = ($siglas[1] ?? $alumno['ciclo']) . ' ' . ($numero[0] ?? '');
  
             <header class="topbar">
                 <span></span>
-                <span class="user-pill"><?= $userName ?></span>
+                <span class="user-pill"><?= $userName ?><?php if ($userRole !== ''): ?> <span class="user-pill__role"><?= $userRole ?></span><?php endif; ?></span>
             </header>
  
             <div class="page-header">
