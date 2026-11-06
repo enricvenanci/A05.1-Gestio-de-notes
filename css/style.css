@@ -663,3 +663,21 @@ p {
         padding: 20px 18px 16px;
     }
 }
+
+/* Errores de validación PHP del login (rosa, en la misma pantalla) */
+.error-php {
+    display: block;
+    margin-top: 4px;
+    color: #d81b7a;
+    font-size: 0.85rem;
+}
+
+.auth-alert {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border: 1px solid #f48fb1;
+    border-radius: 6px;
+    background: #fde7f1;
+    color: #d81b7a;
+    font-size: 13px;
+}

@@ -1,9 +1,9 @@
 <?php 
  
-$servername = 'db';
+$servername = 'localhost';
 $dbname = 'gestio_notes';
-$dbusername = 'nahuel';
-$dbpassword = '95f97h0c';
+$dbusername = 'root';
+$dbpassword = '';
  // ---------------------------------------------------------------------- 
  // PDO: ESTABLECER CONEXIÓN CONTROLANDO ERRORES 
  // En el bloque "try" ponemos el código que puede generar la excepción 

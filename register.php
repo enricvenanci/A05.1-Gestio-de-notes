@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+// Errores (por campo) y datos escritos que deja proc/proc_register.php
+$regErrors = $_SESSION['register_errors'] ?? [];
+$regOld = $_SESSION['register_old'] ?? [];
+unset($_SESSION['register_errors'], $_SESSION['register_old']);
+
+function errorPhp(array $errores, string $campo): string
+{
+    return htmlspecialchars($errores[$campo] ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+function valorViejo(array $datos, string $campo): string
+{
+    return htmlspecialchars($datos[$campo] ?? '', ENT_QUOTES, 'UTF-8');
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -22,44 +40,44 @@
             <form id="form-registro" class="auth-form" method="post" action="proc/proc_register.php">
                 <div class="field">
                     <label for="first-name">Nombre</label>
-                    <input class="input" type="text" id="first-name" name="nombre" onblur="comprobarNombre()">
-                    <span id="error-first-name"></span>
+                    <input class="input" type="text" id="first-name" name="nombre" value="<?= valorViejo($regOld, 'nombre') ?>" onblur="comprobarNombre()">
+                    <span id="error-first-name" class="error-php"><?= errorPhp($regErrors, 'nombre') ?></span>
                 </div>
 
                 <div class="field">
                     <label for="last-name">Apellidos</label>
-                    <input class="input" type="text" id="last-name" name="apellidos" onblur="comprobarApellidos()">
-                    <span id="error-last-name"></span>
+                    <input class="input" type="text" id="last-name" name="apellidos" value="<?= valorViejo($regOld, 'apellidos') ?>" onblur="comprobarApellidos()">
+                    <span id="error-last-name" class="error-php"><?= errorPhp($regErrors, 'apellidos') ?></span>
                 </div>
 
                 <div class="field">
                     <label for="school-email">Correo de la escuela</label>
-                    <input class="input" type="text" id="school-email" name="email" onblur="comprobarEmail()">
-                    <span id="error-school-email"></span>
+                    <input class="input" type="text" id="school-email" name="email" value="<?= valorViejo($regOld, 'email') ?>" onblur="comprobarEmail()">
+                    <span id="error-school-email" class="error-php"><?= errorPhp($regErrors, 'email') ?></span>
                 </div>
 
                 <div class="field">
                     <label for="password">Contraseña</label>
                     <input class="input" type="password" id="password" name="password" onblur="comprobarPasswordRegistro()">
-                    <span id="error-password"></span>
+                    <span id="error-password" class="error-php"><?= errorPhp($regErrors, 'password') ?></span>
                 </div>
 
                 <div class="field">
                     <label for="confirm-password">Confirma contraseña</label>
                     <input class="input" type="password" id="confirm-password" name="confirm_password" onblur="comprobarConfirmar()">
-                    <span id="error-confirm-password"></span>
+                    <span id="error-confirm-password" class="error-php"><?= errorPhp($regErrors, 'confirm_password') ?></span>
                 </div>
 
                 <div class="field">
                     <label for="role">Rol</label>
                     <select class="select" id="role" name="role_id" onblur="comprobarRol()">
                         <option value="">Selecciona un rol</option>
-                        <option value="1">admin</option>
-                        <option value="2">profesor</option>
-                        <option value="3">educador</option>
-                        <option value="4">secretaria</option>
+                        <option value="1"<?= ($regOld['role_id'] ?? '') === '1' ? ' selected' : '' ?>>admin</option>
+                        <option value="2"<?= ($regOld['role_id'] ?? '') === '2' ? ' selected' : '' ?>>profesor</option>
+                        <option value="3"<?= ($regOld['role_id'] ?? '') === '3' ? ' selected' : '' ?>>educador</option>
+                        <option value="4"<?= ($regOld['role_id'] ?? '') === '4' ? ' selected' : '' ?>>secretaria</option>
                     </select>
-                    <span id="error-role"></span>
+                    <span id="error-role" class="error-php"><?= errorPhp($regErrors, 'role_id') ?></span>
                 </div>
 
                 <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse <span aria-hidden="true">→</span></button>
