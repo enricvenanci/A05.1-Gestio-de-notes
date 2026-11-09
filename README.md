@@ -36,7 +36,15 @@ Aplicación web desarrollada en PHP y MySQL para gestionar los alumnos y las not
 - `sql/` y `gestio_notes.sql`: base de datos
 - `css/`, `javascript/` e `img/`: recursos
 - `video-presentacio/`: vídeo de presentación
+# Nombre del proyecto
 
+## Vídeo
+
+[Ver vídeo en YouTube](https://youtu.be/QrEnnZMNpbs?si=8aXyR0aq8fdMJ_vk)
+
+## Descarga
+
+[Descargar archivos](https://we.tl/t-wWQCUjg6nWr9ydy3)
 ## Equipo
 
 - Jun Hao, Alexandra, Ivan, Nahuel, Enric
