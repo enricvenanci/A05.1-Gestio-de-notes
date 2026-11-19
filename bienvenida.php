@@ -24,7 +24,7 @@ $mensajesError = [
 $codigoError = isset($_GET['error']) && is_string($_GET['error']) ? $_GET['error'] : '';
 $mensajeCodigo = $mensajesError[$codigoError] ?? '';
 
-include 'conexion/conexion.php';
+include 'sql/conexion/conexion.php';
 include 'filtros/consultar_alumnos.php';
 
 function e(?string $valor): string

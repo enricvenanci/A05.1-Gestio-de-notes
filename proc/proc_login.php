@@ -22,8 +22,9 @@ if ($username === '' || $password === '') {
     exit;
 }
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
+/** @var PDO $conn */
 try {
     $stmt = $conn->prepare(
         'SELECT id, nombre, apellidos, email, password_hash, rol

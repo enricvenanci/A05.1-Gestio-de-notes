@@ -39,7 +39,7 @@ if (!isset($_POST['notas']) || !is_array($_POST['notas']) || !$_POST['notas']) {
     volver(1, $asignaturaId);
 }
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
 try {
     $asignaturaStmt = $conn->prepare(

@@ -23,8 +23,9 @@ if ($id === false || $id <= 0) {
     exit;
 }
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
+/** @var PDO $conn */
 $rol = 'alumno';
 
 try {
