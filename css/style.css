@@ -460,7 +460,8 @@ p {
 
 #filtro-nombre,
 #filtro-curso,
-#filtro-ciclo {
+#filtro-ciclo,
+#filtro-promocion {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -476,7 +477,8 @@ p {
 }
 
 #curso,
-#ciclo {
+#ciclo,
+#promocion {
     min-width: 170px;
 }
 
@@ -578,6 +580,35 @@ p {
     text-align: center;
 }
 
+.page-action {
+    margin-bottom: 18px;
+}
+
+.grade-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--cream-dark);
+}
+
+.grade-controls .filters__field {
+    flex: 1 1 280px;
+}
+
+.grade-input {
+    width: 120px;
+}
+
+.grade-submit {
+    display: flex;
+    justify-content: flex-end;
+    padding: 14px 6px 6px;
+}
+
 /* Lema inferior */
 .tagline {
     display: flex;
@@ -659,11 +690,30 @@ p {
     }
 
     #curso,
-    #ciclo {
+    #ciclo,
+    #promocion {
         min-width: 0;
     }
 
-    #btn-filtrar {
+    #btn-filtrar,
+    .grade-controls .btn-primary {
+        width: 100%;
+    }
+
+    .grade-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grade-controls .filters__field {
+        flex-basis: auto;
+    }
+
+    .grade-input {
+        width: 100%;
+    }
+
+    .grade-submit .btn-primary {
         width: 100%;
     }
 

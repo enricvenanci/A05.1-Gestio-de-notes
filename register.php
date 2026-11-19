@@ -1,20 +1,14 @@
 <?php
-session_start();
-
-// Errores (por campo) y datos escritos que deja proc/proc_register.php
-$regErrors = $_SESSION['register_errors'] ?? [];
-$regOld = $_SESSION['register_old'] ?? [];
-unset($_SESSION['register_errors'], $_SESSION['register_old']);
-
-function errorPhp(array $errores, string $campo): string
-{
-    return htmlspecialchars($errores[$campo] ?? '', ENT_QUOTES, 'UTF-8');
-}
-
-function valorViejo(array $datos, string $campo): string
-{
-    return htmlspecialchars($datos[$campo] ?? '', ENT_QUOTES, 'UTF-8');
-}
+$mensajesError = [
+    '1' => 'Revisa los datos introducidos.',
+    '2' => 'El correo electrónico no es válido.',
+    '3' => 'La contraseña no cumple los requisitos.',
+    '4' => 'Las contraseñas no coinciden.',
+    '5' => 'Ya existe una cuenta con ese correo electrónico.',
+    '6' => 'No se pudo completar el registro. Inténtalo de nuevo.',
+];
+$codigoError = isset($_GET['error']) && is_string($_GET['error']) ? $_GET['error'] : '';
+$mensajeError = $mensajesError[$codigoError] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -36,51 +30,42 @@ function valorViejo(array $datos, string $campo): string
         <section class="auth-card" aria-label="Crear una cuenta">
             <h1>Crea tu cuenta</h1>
             <p class="auth-card__intro">Completa tus datos para registrarte.</p>
+            <?php if ($mensajeError !== ''): ?>
+                <p class="msg error" role="alert"><?= htmlspecialchars($mensajeError, ENT_QUOTES, 'UTF-8') ?></p>
+            <?php endif; ?>
 
             <form id="form-registro" class="auth-form" method="post" action="proc/proc_register.php">
                 <div class="field">
                     <label for="first-name">Nombre</label>
-                    <input class="input" type="text" id="first-name" name="nombre" value="<?= valorViejo($regOld, 'nombre') ?>" onblur="comprobarNombre()">
-                    <span id="error-first-name" class="error-php"><?= errorPhp($regErrors, 'nombre') ?></span>
+                    <input class="input" type="text" id="first-name" name="nombre" maxlength="50" required onblur="comprobarNombre()">
+                    <span id="error-first-name"></span>
                 </div>
 
                 <div class="field">
                     <label for="last-name">Apellidos</label>
-                    <input class="input" type="text" id="last-name" name="apellidos" value="<?= valorViejo($regOld, 'apellidos') ?>" onblur="comprobarApellidos()">
-                    <span id="error-last-name" class="error-php"><?= errorPhp($regErrors, 'apellidos') ?></span>
+                    <input class="input" type="text" id="last-name" name="apellidos" maxlength="100" required onblur="comprobarApellidos()">
+                    <span id="error-last-name"></span>
                 </div>
 
                 <div class="field">
                     <label for="school-email">Correo de la escuela</label>
-                    <input class="input" type="text" id="school-email" name="email" value="<?= valorViejo($regOld, 'email') ?>" onblur="comprobarEmail()">
-                    <span id="error-school-email" class="error-php"><?= errorPhp($regErrors, 'email') ?></span>
+                    <input class="input" type="email" id="school-email" name="email" maxlength="100" required onblur="comprobarEmail()">
+                    <span id="error-school-email"></span>
                 </div>
 
                 <div class="field">
                     <label for="password">Contraseña</label>
-                    <input class="input" type="password" id="password" name="password" onblur="comprobarPasswordRegistro()">
-                    <span id="error-password" class="error-php"><?= errorPhp($regErrors, 'password') ?></span>
+                    <input class="input" type="password" id="password" name="password" required onblur="comprobarPasswordRegistro()">
+                    <span id="error-password"></span>
                 </div>
 
                 <div class="field">
                     <label for="confirm-password">Confirma contraseña</label>
-                    <input class="input" type="password" id="confirm-password" name="confirm_password" onblur="comprobarConfirmar()">
-                    <span id="error-confirm-password" class="error-php"><?= errorPhp($regErrors, 'confirm_password') ?></span>
+                    <input class="input" type="password" id="confirm-password" name="confirm_password" required onblur="comprobarConfirmar()">
+                    <span id="error-confirm-password"></span>
                 </div>
 
-                <div class="field">
-                    <label for="role">Rol</label>
-                    <select class="select" id="role" name="role_id" onblur="comprobarRol()">
-                        <option value="">Selecciona un rol</option>
-                        <option value="1"<?= ($regOld['role_id'] ?? '') === '1' ? ' selected' : '' ?>>admin</option>
-                        <option value="2"<?= ($regOld['role_id'] ?? '') === '2' ? ' selected' : '' ?>>profesor</option>
-                        <option value="3"<?= ($regOld['role_id'] ?? '') === '3' ? ' selected' : '' ?>>educador</option>
-                        <option value="4"<?= ($regOld['role_id'] ?? '') === '4' ? ' selected' : '' ?>>secretaria</option>
-                    </select>
-                    <span id="error-role" class="error-php"><?= errorPhp($regErrors, 'role_id') ?></span>
-                </div>
-
-                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse <span aria-hidden="true">→</span></button>
+                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse como alumno <span aria-hidden="true">→</span></button>
             </form>
 
             <p class="auth-card__foot">
