@@ -1,69 +1,57 @@
 <?php
 session_start();
 
-function viene_de(string $pagina): bool
-{
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    if ($referer === '') {
-        return true;
-    }
-
-    $partes      = parse_url($referer);
-    $hostReferer = $partes['host'] ?? '';
-    $hostActual  = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
-    $paginaRef   = basename($partes['path'] ?? '');
-
-    return $hostReferer === $hostActual && $paginaRef === $pagina;
-}
-
-// 1. Solo se entra por POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../bienvenida.php');
     exit;
 }
 
-// 2. Hay que haber iniciado sesión (lo fija proc_login.php)
-if (empty($_SESSION['user_id'])) {
-    header('Location: ../index.php');
+if (
+    !isset($_SESSION['user_id'], $_SESSION['user_role'])
+    || $_SESSION['user_role'] !== 'admin'
+) {
+    header('Location: ../index.php?error=1');
     exit;
 }
 
-// 3. La petición debe venir de bienvenida.php
-if (!viene_de('bienvenida.php')) {
-    header('Location: ../bienvenida.php');
-    exit;
-}
-
-// 4. Acción permitida: eliminar alumno
-if (($_POST['accion'] ?? '') !== 'eliminar') {
-    header('Location: ../bienvenida.php');
-    exit;
-}
-
-$id = (isset($_POST['id']) && ctype_digit($_POST['id'])) ? (int) $_POST['id'] : 0;
-if ($id <= 0) {
-    $_SESSION['flash_error'] = 'Alumno no válido.';
-    header('Location: ../bienvenida.php');
+$id = isset($_POST['id']) && is_string($_POST['id'])
+    ? filter_var($_POST['id'], FILTER_VALIDATE_INT)
+    : false;
+if ($id === false || $id <= 0) {
+    header('Location: ../bienvenida.php?error=2');
     exit;
 }
 
 include '../conexion/conexion.php';
 
+$rol = 'alumno';
+
 try {
-    $stmt = $conn->prepare('SELECT nombre, apellidos FROM alumnos WHERE id = :id LIMIT 1');
-    $stmt->execute(['id' => $id]);
+    $stmt = $conn->prepare(
+        'SELECT nombre, apellidos
+         FROM usuaris
+         WHERE id = :id AND rol = :rol
+         LIMIT 1'
+    );
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':rol', $rol, PDO::PARAM_STR);
+    $stmt->execute();
     $alumno = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$alumno) {
         $_SESSION['flash_error'] = 'El alumno ya no existe.';
     } else {
-        // Sus notas se borran solas (ON DELETE CASCADE en la tabla notas)
-        $del = $conn->prepare('DELETE FROM alumnos WHERE id = :id');
-        $del->execute(['id' => $id]);
-        $_SESSION['flash_ok'] = 'Alumno eliminado: ' . $alumno['nombre'] . ' ' . $alumno['apellidos'] . '.';
+        $deleteStmt = $conn->prepare(
+            'DELETE FROM usuaris WHERE id = :id AND rol = :rol'
+        );
+        $deleteStmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $deleteStmt->bindParam(':rol', $rol, PDO::PARAM_STR);
+        $deleteStmt->execute();
+        $_SESSION['flash_ok'] = 'Alumno eliminado: '
+            . $alumno['nombre'] . ' ' . $alumno['apellidos'] . '.';
     }
-} catch (PDOException $e) {
-    error_log('proc_alumnos.php: ' . $e->getMessage());
+} catch (PDOException $exception) {
+    error_log('proc_alumnos.php: ' . $exception->getMessage());
     $_SESSION['flash_error'] = 'No se pudo eliminar al alumno. Inténtalo de nuevo.';
 }
 
