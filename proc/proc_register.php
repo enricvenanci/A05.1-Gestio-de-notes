@@ -68,3 +68,29 @@ if (!preg_match('/[0-9]/', $password)) {
 if ($password !== $confirmPassword) {
     redirigirError(4);
 }
+
+include '../conexion/conexion.php';
+
+$userStmt = $conn->prepare(
+    'INSERT INTO usuaris (nombre, apellidos, email, password_hash, rol)
+     VALUES (:nombre, :apellidos, :email, :password_hash, :rol)'
+);
+
+try {
+    $userStmt->execute([
+        'nombre' => $nombre,
+        'apellidos' => $apellidos,
+        'email' => $email,
+        'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        'rol' => 'alumno',
+    ]);
+} catch (PDOException $exception) {
+    if (($exception->errorInfo[1] ?? null) === 1062) {
+        redirigirError(5);
+    }
+    error_log('proc_register.php: ' . $exception->getMessage());
+    redirigirError(6);
+}
+
+header('Location: ../index.php');
+exit;
