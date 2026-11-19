@@ -22,7 +22,7 @@ if ($id === false || $id <= 0) {
     exit;
 }
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
 $rol = 'alumno';
 

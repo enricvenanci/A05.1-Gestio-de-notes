@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'], $_SESSION['user_name'])) {
     exit;
 }
  
-include 'conexion/conexion.php';
+include 'sql/conexion/conexion.php';
  
 $userName = $_SESSION['user_name'];
 $userRole = $_SESSION['user_role'] ?? '';
