@@ -21,3 +21,39 @@ if ($id === false || $id <= 0) {
     header('Location: ../bienvenida.php?error=2');
     exit;
 }
+
+include '../conexion/conexion.php';
+
+$rol = 'alumno';
+
+try {
+    $stmt = $conn->prepare(
+        'SELECT nombre, apellidos
+         FROM usuaris
+         WHERE id = :id AND rol = :rol
+         LIMIT 1'
+    );
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':rol', $rol, PDO::PARAM_STR);
+    $stmt->execute();
+    $alumno = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$alumno) {
+        $_SESSION['flash_error'] = 'El alumno ya no existe.';
+    } else {
+        $deleteStmt = $conn->prepare(
+            'DELETE FROM usuaris WHERE id = :id AND rol = :rol'
+        );
+        $deleteStmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $deleteStmt->bindParam(':rol', $rol, PDO::PARAM_STR);
+        $deleteStmt->execute();
+        $_SESSION['flash_ok'] = 'Alumno eliminado: '
+            . $alumno['nombre'] . ' ' . $alumno['apellidos'] . '.';
+    }
+} catch (PDOException $exception) {
+    error_log('proc_alumnos.php: ' . $exception->getMessage());
+    $_SESSION['flash_error'] = 'No se pudo eliminar al alumno. Inténtalo de nuevo.';
+}
+
+header('Location: ../bienvenida.php');
+exit;
