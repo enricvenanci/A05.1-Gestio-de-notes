@@ -24,7 +24,7 @@ if ($rol === 'alumno') {
     exit;
 }
 
-include 'conexion/conexion.php';
+include 'sql/conexion/conexion.php';
 
 try {
     $alumnoStmt = $conn->prepare(

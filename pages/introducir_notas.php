@@ -17,7 +17,7 @@ $codigoError = isset($_GET['error']) && is_string($_GET['error']) ? $_GET['error
 $mensajeError = $mensajesError[$codigoError] ?? '';
 $guardado = isset($_GET['ok']) && $_GET['ok'] === '1';
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
 try {
     $asignaturasStmt = $conn->prepare(
