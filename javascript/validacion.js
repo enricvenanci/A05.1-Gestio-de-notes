@@ -166,15 +166,6 @@ function comprobarConfirmar() {
     return true;
 }
 
-function comprobarRol() {
-    if (document.getElementById('role').value === '') {
-        mostrarError('role', 'Selecciona un rol.');
-        return false;
-    }
-    quitarError('role');
-    return true;
-}
-
 // ---------- LOGIN (onclick del botón) ----------
 function validarLogin() {
     var ok = true;
@@ -194,7 +185,6 @@ function validarRegistro() {
     if (!comprobarEmail()) { ok = false; }
     if (!comprobarPasswordRegistro()) { ok = false; }
     if (!comprobarConfirmar()) { ok = false; }
-    if (!comprobarRol()) { ok = false; }
 
     return ok;
 }

@@ -1,3 +1,15 @@
+<?php
+$mensajesError = [
+    '1' => 'Revisa los datos introducidos.',
+    '2' => 'El correo electrónico no es válido.',
+    '3' => 'La contraseña no cumple los requisitos.',
+    '4' => 'Las contraseñas no coinciden.',
+    '5' => 'Ya existe una cuenta con ese correo electrónico.',
+    '6' => 'No se pudo completar el registro. Inténtalo de nuevo.',
+];
+$codigoError = isset($_GET['error']) && is_string($_GET['error']) ? $_GET['error'] : '';
+$mensajeError = $mensajesError[$codigoError] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,51 +30,42 @@
         <section class="auth-card" aria-label="Crear una cuenta">
             <h1>Crea tu cuenta</h1>
             <p class="auth-card__intro">Completa tus datos para registrarte.</p>
+            <?php if ($mensajeError !== ''): ?>
+                <p class="msg error" role="alert"><?= htmlspecialchars($mensajeError, ENT_QUOTES, 'UTF-8') ?></p>
+            <?php endif; ?>
 
             <form id="form-registro" class="auth-form" method="post" action="proc/proc_register.php">
                 <div class="field">
                     <label for="first-name">Nombre</label>
-                    <input class="input" type="text" id="first-name" name="nombre" onblur="comprobarNombre()">
+                    <input class="input" type="text" id="first-name" name="nombre" maxlength="50" required onblur="comprobarNombre()">
                     <span id="error-first-name"></span>
                 </div>
 
                 <div class="field">
                     <label for="last-name">Apellidos</label>
-                    <input class="input" type="text" id="last-name" name="apellidos" onblur="comprobarApellidos()">
+                    <input class="input" type="text" id="last-name" name="apellidos" maxlength="100" required onblur="comprobarApellidos()">
                     <span id="error-last-name"></span>
                 </div>
 
                 <div class="field">
                     <label for="school-email">Correo de la escuela</label>
-                    <input class="input" type="text" id="school-email" name="email" onblur="comprobarEmail()">
+                    <input class="input" type="email" id="school-email" name="email" maxlength="100" required onblur="comprobarEmail()">
                     <span id="error-school-email"></span>
                 </div>
 
                 <div class="field">
                     <label for="password">Contraseña</label>
-                    <input class="input" type="password" id="password" name="password" onblur="comprobarPasswordRegistro()">
+                    <input class="input" type="password" id="password" name="password" required onblur="comprobarPasswordRegistro()">
                     <span id="error-password"></span>
                 </div>
 
                 <div class="field">
                     <label for="confirm-password">Confirma contraseña</label>
-                    <input class="input" type="password" id="confirm-password" name="confirm_password" onblur="comprobarConfirmar()">
+                    <input class="input" type="password" id="confirm-password" name="confirm_password" required onblur="comprobarConfirmar()">
                     <span id="error-confirm-password"></span>
                 </div>
 
-                <div class="field">
-                    <label for="role">Rol</label>
-                    <select class="select" id="role" name="role_id" onblur="comprobarRol()">
-                        <option value="">Selecciona un rol</option>
-                        <option value="1">admin</option>
-                        <option value="2">profesor</option>
-                        <option value="3">educador</option>
-                        <option value="4">secretaria</option>
-                    </select>
-                    <span id="error-role"></span>
-                </div>
-
-                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse <span aria-hidden="true">→</span></button>
+                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse como alumno <span aria-hidden="true">→</span></button>
             </form>
 
             <p class="auth-card__foot">
