@@ -71,6 +71,7 @@ if ($password !== $confirmPassword) {
 
 include '../sql/conexion/conexion.php';
 
+/** @var PDO $conn */
 $userStmt = $conn->prepare(
     'INSERT INTO usuaris (nombre, apellidos, email, password_hash, rol)
      VALUES (:nombre, :apellidos, :email, :password_hash, :rol)'
