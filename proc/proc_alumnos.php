@@ -14,6 +14,7 @@ if (
     exit;
 }
 
+
 $id = isset($_POST['id']) && is_string($_POST['id'])
     ? filter_var($_POST['id'], FILTER_VALIDATE_INT)
     : false;
