@@ -39,3 +39,32 @@ if (mb_strlen($apellidos) < 2 || mb_strlen($apellidos) > 100) {
 if (preg_match('/[0-9]/', $apellidos)) {
     redirigirError(1);
 }
+
+// ---------- Correo ----------
+if ($email === '') {
+    redirigirError(2);
+}
+if (
+    mb_strlen($email) > 100
+    || !filter_var($email, FILTER_VALIDATE_EMAIL)
+    || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)
+) {
+    redirigirError(2);
+}
+
+// ---------- Contraseña ----------
+if ($password === '') {
+    redirigirError(3);
+}
+if (preg_match_all('/\p{L}/u', $password) < 2) {
+    redirigirError(3);
+}
+if (!preg_match('/\p{Lu}/u', $password)) {
+    redirigirError(3);
+}
+if (!preg_match('/[0-9]/', $password)) {
+    redirigirError(3);
+}
+if ($password !== $confirmPassword) {
+    redirigirError(4);
+}
