@@ -24,6 +24,7 @@ if ($id === false || $id <= 0) {
 
 include '../sql/conexion/conexion.php';
 
+/** @var PDO $conn */
 $rol = 'alumno';
 
 try {
