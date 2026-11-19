@@ -22,7 +22,7 @@ if ($username === '' || $password === '') {
     exit;
 }
 
-include '../conexion/conexion.php';
+include '../sql/conexion/conexion.php';
 
 try {
     $stmt = $conn->prepare(

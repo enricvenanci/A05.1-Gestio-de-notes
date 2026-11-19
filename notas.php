@@ -13,7 +13,7 @@ if (!isset($_GET['idAlumno'])) {
     exit();
 }
  
-include_once('./conexion/conexion.php');
+include_once('./sql/conexion/conexion.php');
  
 // Nombre del usuario que ha hecho login (el de la cabecera)
 $userName = htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8');
