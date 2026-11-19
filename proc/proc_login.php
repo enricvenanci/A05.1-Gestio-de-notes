@@ -41,3 +41,27 @@ try {
     header('Location: ../index.php?error=1');
     exit;
 }
+
+if (
+    !$user
+    || $user['password_hash'] === null
+    || !password_verify($password, $user['password_hash'])
+) {
+    header('Location: ../index.php?error=1');
+    exit;
+}
+
+session_regenerate_id(true);
+$_SESSION['user_id'] = (int) $user['id'];
+$_SESSION['user_role'] = $user['rol'];
+$_SESSION['user_name'] = $user['nombre'];
+$_SESSION['user_full_name'] = $user['nombre'] . ' ' . $user['apellidos'];
+$_SESSION['user_email'] = $user['email'];
+
+if ($user['rol'] === 'alumno') {
+    header('Location: ../notas.php');
+    exit;
+}
+
+header('Location: ../bienvenida.php');
+exit;
