@@ -1,83 +1,80 @@
 <?php
 session_start();
- 
-// Si no ha hecho login, vuelve al inicio
-if (!isset($_SESSION['user_id'], $_SESSION['user_name'])) {
+
+if (!isset($_SESSION['user_id'], $_SESSION['user_role'])) {
     header('Location: index.php');
-    exit();
+    exit;
 }
- 
-// Si no llega el id del alumno, vuelve al listado de alumnos
-if (!isset($_GET['idAlumno'])) {
-    header('Location: bienvenida.php');
-    exit();
-}
- 
-include_once('./conexion/conexion.php');
- 
-// Nombre del usuario que ha hecho login (el de la cabecera)
-$userName = htmlspecialchars($_SESSION['user_name'], ENT_QUOTES, 'UTF-8');
-$userRole = htmlspecialchars(ucfirst($_SESSION['user_role'] ?? ''), ENT_QUOTES, 'UTF-8');
- 
-// Id del alumno que viene del listado. Con (int) nos aseguramos de que es un número
-$idAlumno = (int) $_GET['idAlumno'];
- 
-try {
-    // PASO 1: datos del alumno (la vista ya une alumno + curso + ciclo)
-    $sql = "SELECT id, nombre, apellidos, curso_id, curso, ciclo
-            FROM vista_alumnos
-            WHERE id = :idAlumno";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':idAlumno', $idAlumno, PDO::PARAM_INT);
-    $stmt->execute();
-    $alumno = $stmt->fetch(PDO::FETCH_ASSOC);
- 
-    // Si no existe ningún alumno con ese id
-    if ($alumno === false) {
-        echo "No hay ningún alumno con ese ID. ";
-        echo "<a href='./bienvenida.php'>Volver al listado</a>";
-        exit();
+
+$rol = $_SESSION['user_role'];
+if ($rol === 'alumno') {
+    $idAlumno = (int) $_SESSION['user_id'];
+} elseif (
+    in_array($rol, ['admin', 'profesor', 'educador', 'secretaria'], true)
+    && isset($_GET['idAlumno'])
+    && is_string($_GET['idAlumno'])
+) {
+    $idAlumno = filter_var($_GET['idAlumno'], FILTER_VALIDATE_INT);
+    if ($idAlumno === false || $idAlumno <= 0) {
+        header('Location: bienvenida.php?error=2');
+        exit;
     }
- 
-    // PASO 2: asignaturas del curso del alumno con su nota.
-    // LEFT JOIN: si la asignatura aún no tiene nota, sale NULL
-    $sql2 = "SELECT asignaturas.nombre, notas.nota
-             FROM asignaturas
-             LEFT JOIN notas ON notas.asignatura_id = asignaturas.id
-                            AND notas.alumno_id = :idAlumno2
-             WHERE asignaturas.curso_id = :idCurso
-             ORDER BY asignaturas.id";
-    $stmt2 = $conn->prepare($sql2);
-    $stmt2->bindParam(':idAlumno2', $idAlumno, PDO::PARAM_INT);
-    $stmt2->bindParam(':idCurso', $alumno['curso_id'], PDO::PARAM_INT);
-    $stmt2->execute();
-    $asignaturas = $stmt2->fetchAll(PDO::FETCH_ASSOC);
- 
-    $stmt = null;
-    $stmt2 = null;
-    $conn = null;
- 
-} catch (PDOException $e) {
-    die("Error en la consulta: " . $e->getMessage());
+} else {
+    header('Location: bienvenida.php');
+    exit;
 }
- 
-// Calculamos la media y cuántas asignaturas tienen nota
-$suma = 0;
+
+include 'conexion/conexion.php';
+
+try {
+    $alumnoStmt = $conn->prepare(
+        'SELECT id, nombre, apellidos
+         FROM usuaris
+         WHERE id = :id AND rol = :rol
+         LIMIT 1'
+    );
+    $alumnoStmt->execute(['id' => $idAlumno, 'rol' => 'alumno']);
+    $alumno = $alumnoStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$alumno) {
+        header($rol === 'alumno' ? 'Location: logout.php' : 'Location: bienvenida.php?error=2');
+        exit;
+    }
+
+    $matriculasStmt = $conn->prepare(
+        'SELECT a.nombre AS asignatura, c.nombre AS ciclo, n.nombre AS curso,
+                p.nombre AS promocion, m.nota
+         FROM matriculas m
+         INNER JOIN asignaturas a ON a.id = m.asignatura_id
+         INNER JOIN ciclos c ON c.id = a.ciclo_id
+         INNER JOIN niveles n ON n.id = a.nivel_id
+         INNER JOIN promociones p ON p.id = m.promocion_id
+         WHERE m.alumno_id = :alumno
+         ORDER BY p.id DESC, c.nombre, n.id, a.nombre'
+    );
+    $matriculasStmt->execute(['alumno' => $idAlumno]);
+    $matriculas = $matriculasStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $exception) {
+    error_log('notas.php: ' . $exception->getMessage());
+    http_response_code(500);
+    exit('No se pudieron consultar las notas.');
+}
+
+function e(?string $valor): string
+{
+    return htmlspecialchars($valor ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+$suma = 0.0;
 $evaluadas = 0;
-foreach ($asignaturas as $fila) {
-    if ($fila['nota'] !== null) {
-        $suma += $fila['nota'];
+foreach ($matriculas as $matricula) {
+    if ($matricula['nota'] !== null) {
+        $suma += (float) $matricula['nota'];
         $evaluadas++;
     }
 }
-$media = ($evaluadas > 0) ? number_format($suma / $evaluadas, 1, ',', '') : '—';
- 
-// Datos para pintar: id con formato AL-0012 y curso tipo "DAW 2"
-$codigoAlumno = sprintf('AL-%04d', $alumno['id']);
- 
-preg_match('/\((.*?)\)/', $alumno['ciclo'], $siglas);   // lo que hay entre paréntesis: DAW
-preg_match('/\d+/', $alumno['curso'], $numero);         // el número del curso: 2
-$etiquetaCurso = ($siglas[1] ?? $alumno['ciclo']) . ' ' . ($numero[0] ?? '');
+$media = $evaluadas > 0 ? number_format($suma / $evaluadas, 2, ',', '') : '—';
+$nombreCompleto = $alumno['nombre'] . ' ' . $alumno['apellidos'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -89,7 +86,6 @@ $etiquetaCurso = ($siglas[1] ?? $alumno['ciclo']) . ' ' . ($numero[0] ?? '');
 </head>
 <body>
     <div class="app">
- 
         <aside class="sidebar">
             <div class="sidebar__brand">
                 <img class="sidebar__logo" src="img/logo_gestion_nota.png" alt="Logo del Colegio Internacional San Miguel Arcángel">
@@ -97,52 +93,61 @@ $etiquetaCurso = ($siglas[1] ?? $alumno['ciclo']) . ' ' . ($numero[0] ?? '');
             </div>
             <a class="sidebar__logout" href="logout.php">Cerrar sesión</a>
         </aside>
- 
+
         <div class="main">
- 
             <header class="topbar">
                 <span></span>
-                <span class="user-pill"><?= $userName ?><?php if ($userRole !== ''): ?> <span class="user-pill__role"><?= $userRole ?></span><?php endif; ?></span>
+                <span class="user-pill"><?= e($_SESSION['user_full_name'] ?? $_SESSION['user_name'] ?? '') ?></span>
             </header>
- 
+
             <div class="page-header">
-                <div class="page-icon">&#9670;</div>
+                <div class="page-icon" aria-hidden="true">&#9670;</div>
                 <div>
                     <h1 class="page-title">Notas del alumno</h1>
-                    <p class="page-subtitle">Consulta las calificaciones de cada asignatura.</p>
+                    <p class="page-subtitle">Consulta las calificaciones de cada asignatura y promoción.</p>
                 </div>
             </div>
- 
+
             <section class="card">
                 <div class="card__head">
-                    <span><?= htmlspecialchars($alumno['nombre'] . ' ' . $alumno['apellidos'], ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($etiquetaCurso, ENT_QUOTES, 'UTF-8') ?> · <?= $codigoAlumno ?></span>
-                    <a href="bienvenida.php">&larr; Volver al listado</a>
+                    <span><?= e($nombreCompleto) ?></span>
+                    <?php if ($rol !== 'alumno'): ?>
+                        <a href="bienvenida.php">&larr; Volver al listado</a>
+                    <?php endif; ?>
                 </div>
- 
-                <div class="table-wrap">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Asignatura</th>
-                                <th>Nota</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($asignaturas as $fila) { ?>
+                <?php if (!$matriculas): ?>
+                    <p class="empty">Este alumno todavía no tiene matrículas.</p>
+                <?php else: ?>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td class="cell-name"><?= htmlspecialchars($fila['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= ($fila['nota'] !== null) ? number_format($fila['nota'], 1, ',', '') : '—' ?></td>
+                                    <th>Promoción</th>
+                                    <th>Ciclo</th>
+                                    <th>Curso</th>
+                                    <th>Asignatura</th>
+                                    <th>Nota</th>
                                 </tr>
-                            <?php } ?>
-                            <tr>
-                                <td class="cell-name">Media general (<?= $evaluadas ?> evaluadas)</td>
-                                <td class="cell-name"><?= $media ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($matriculas as $matricula): ?>
+                                    <tr>
+                                        <td><?= e($matricula['promocion']) ?></td>
+                                        <td><?= e($matricula['ciclo']) ?></td>
+                                        <td><?= e($matricula['curso']) ?></td>
+                                        <td class="cell-name"><?= e($matricula['asignatura']) ?></td>
+                                        <td><?= $matricula['nota'] !== null ? number_format((float) $matricula['nota'], 2, ',', '') : '—' ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td class="cell-name" colspan="4">Media (<?= $evaluadas ?> calificaciones)</td>
+                                    <td class="cell-name"><?= $media ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </section>
- 
         </div>
     </div>
 </body>
