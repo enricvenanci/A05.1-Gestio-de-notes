@@ -1,3 +1,8 @@
+<?php
+$error = isset($_GET['error']) && $_GET['error'] === '1'
+    ? 'El nombre de usuario o la contraseña no son válidos.'
+    : '';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,17 +23,20 @@
         <section class="auth-card" aria-label="Inicio de sesión">
             <h1>Bienvenido de nuevo</h1>
             <p class="auth-card__intro">Accede a tu cuenta para continuar.</p>
+            <?php if ($error !== ''): ?>
+                <p class="msg error" role="alert"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
+            <?php endif; ?>
 
             <form class="auth-form" method="post" action="proc/proc_login.php" aria-label="Formulario de inicio de sesión">
                 <div class="field">
                     <label for="username">Nombre</label>
-                    <input class="input" type="text" id="username" name="username" onblur="comprobarUsuario()">
+                    <input class="input" type="text" id="username" name="username" maxlength="100" required onblur="comprobarUsuario()">
                     <span id="error-username"></span>
                 </div>
 
                 <div class="field">
                     <label for="password">Contraseña</label>
-                    <input class="input" type="password" id="password" name="password" onblur="comprobarPassword()">
+                    <input class="input" type="password" id="password" name="password" required onblur="comprobarPassword()">
                     <span id="error-password"></span>
                 </div>
 
