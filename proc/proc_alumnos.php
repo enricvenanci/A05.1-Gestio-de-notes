@@ -13,3 +13,11 @@ if (
     header('Location: ../index.php?error=1');
     exit;
 }
+
+$id = isset($_POST['id']) && is_string($_POST['id'])
+    ? filter_var($_POST['id'], FILTER_VALIDATE_INT)
+    : false;
+if ($id === false || $id <= 0) {
+    header('Location: ../bienvenida.php?error=2');
+    exit;
+}
