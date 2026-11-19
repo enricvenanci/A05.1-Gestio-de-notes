@@ -1,10 +1,8 @@
 <?php
-include '../conexion/conexion.php';
-
-function error(string $mensaje): void
+function redirigirError(int $codigo): void
 {
-    http_response_code(400);
-    exit(htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') . '<br><a href="../register.php">Volver</a>');
+    header('Location: ../register.php?error=' . $codigo);
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -19,87 +17,79 @@ $password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST[
 $confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])
     ? $_POST['confirm_password']
     : '';
-$roleId = filter_var($_POST['role_id'] ?? '', FILTER_VALIDATE_INT);
 
 // ---------- Nombre ----------
 if ($nombre === '') {
-    error('El nombre es obligatorio.');
+    redirigirError(1);
 }
-if (mb_strlen($nombre) < 2) {
-    error('El nombre debe tener al menos 2 letras.');
+if (mb_strlen($nombre) < 2 || mb_strlen($nombre) > 50) {
+    redirigirError(1);
 }
 if (preg_match('/[0-9]/', $nombre)) {
-    error('El nombre no puede contener números.');
+    redirigirError(1);
 }
 
 // ---------- Apellidos ----------
 if ($apellidos === '') {
-    error('Los apellidos son obligatorios.');
+    redirigirError(1);
 }
-if (mb_strlen($apellidos) < 2) {
-    error('Los apellidos deben tener al menos 2 letras.');
+if (mb_strlen($apellidos) < 2 || mb_strlen($apellidos) > 100) {
+    redirigirError(1);
 }
 if (preg_match('/[0-9]/', $apellidos)) {
-    error('Los apellidos no pueden contener números.');
+    redirigirError(1);
 }
 
 // ---------- Correo ----------
 if ($email === '') {
-    error('El correo es obligatorio.');
+    redirigirError(2);
 }
-// Mismo formato que en JavaScript: texto @ texto . al menos 2 letras
-if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)) {
-    error('El correo electrónico no es válido.');
+if (
+    mb_strlen($email) > 100
+    || !filter_var($email, FILTER_VALIDATE_EMAIL)
+    || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)
+) {
+    redirigirError(2);
 }
 
 // ---------- Contraseña ----------
 if ($password === '') {
-    error('La contraseña es obligatoria.');
+    redirigirError(3);
 }
 if (preg_match_all('/\p{L}/u', $password) < 2) {
-    error('La contraseña debe tener al menos 2 letras.');
+    redirigirError(3);
 }
 if (!preg_match('/\p{Lu}/u', $password)) {
-    error('La contraseña debe tener al menos 1 mayúscula.');
+    redirigirError(3);
 }
 if (!preg_match('/[0-9]/', $password)) {
-    error('La contraseña debe tener al menos 1 número.');
+    redirigirError(3);
 }
 if ($password !== $confirmPassword) {
-    error('Las contraseñas no coinciden.');
+    redirigirError(4);
 }
 
-// ---------- Rol ----------
-if ($roleId === false) {
-    error('Selecciona un rol.');
-}
-
-$roleStmt = $conn->prepare('SELECT id FROM roles WHERE id = ?');
-$roleStmt->execute([$roleId]);
-$roleId = $roleStmt->fetchColumn();
-
-if ($roleId === false) {
-    error('El rol seleccionado no existe.');
-}
+include '../conexion/conexion.php';
 
 $userStmt = $conn->prepare(
-    'INSERT INTO usuarios (nombre, apellidos, email, password_hash, rol_id) VALUES (?, ?, ?, ?, ?)'
+    'INSERT INTO usuaris (nombre, apellidos, email, password_hash, rol)
+     VALUES (:nombre, :apellidos, :email, :password_hash, :rol)'
 );
 
 try {
     $userStmt->execute([
-        $nombre,
-        $apellidos,
-        $email,
-        password_hash($password, PASSWORD_DEFAULT),
-        $roleId,
+        'nombre' => $nombre,
+        'apellidos' => $apellidos,
+        'email' => $email,
+        'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        'rol' => 'alumno',
     ]);
 } catch (PDOException $exception) {
     if (($exception->errorInfo[1] ?? null) === 1062) {
-        error('El correo electrónico ya está registrado.');
+        redirigirError(5);
     }
-
-    throw $exception;
+    error_log('proc_register.php: ' . $exception->getMessage());
+    redirigirError(6);
 }
 
 header('Location: ../index.php');
