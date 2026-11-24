@@ -53,7 +53,10 @@ function e(?string $valor): string
         <div class="main">
             <header class="topbar">
                 <span></span>
-                <span class="user-pill"><?= e($userName) ?> · <?= e($userRole) ?></span>
+                <span class="user-pill">
+                    <?= e($userName) ?>
+                    <span class="user-role-tag"><?= e($userRole) ?></span>
+                </span>
             </header>
 
             <div class="page-header">

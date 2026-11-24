@@ -5,6 +5,50 @@ function redirigirError(int $codigo): void
     exit;
 }
 
+function contieneDigito(string $valor): bool
+{
+    return strpbrk($valor, '0123456789') !== false;
+}
+
+function analizarLetras(string $valor): array
+{
+    $cantidadLetras = 0;
+    $tieneMayuscula = false;
+    $longitud = mb_strlen($valor, 'UTF-8');
+
+    for ($indice = 0; $indice < $longitud; $indice++) {
+        $caracter = mb_substr($valor, $indice, 1, 'UTF-8');
+        $mayuscula = mb_strtoupper($caracter, 'UTF-8');
+        $minuscula = mb_strtolower($caracter, 'UTF-8');
+
+        if ($mayuscula !== $minuscula) {
+            $cantidadLetras++;
+        }
+        if ($mayuscula === $caracter && $minuscula !== $caracter) {
+            $tieneMayuscula = true;
+        }
+    }
+
+    return [$cantidadLetras, $tieneMayuscula];
+}
+
+function correoTieneFormatoValido(string $email): bool
+{
+    if (strpbrk($email, " \t\n\r\0\x0B\f") !== false) {
+        return false;
+    }
+
+    $partes = explode('@', $email);
+    if (count($partes) !== 2 || $partes[0] === '' || $partes[1] === '') {
+        return false;
+    }
+
+    $ultimoPunto = strrpos($partes[1], '.');
+    return $ultimoPunto !== false
+        && $ultimoPunto > 0
+        && strlen(substr($partes[1], $ultimoPunto + 1)) >= 2;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../register.php');
     exit;
@@ -27,7 +71,7 @@ if ($nombre === '') {
 if (mb_strlen($nombre) < 2 || mb_strlen($nombre) > 50) {
     redirigirError(1);
 }
-if (preg_match('/[0-9]/', $nombre)) {
+if (contieneDigito($nombre)) {
     redirigirError(1);
 }
 
@@ -38,7 +82,7 @@ if ($apellidos === '') {
 if (mb_strlen($apellidos) < 2 || mb_strlen($apellidos) > 100) {
     redirigirError(1);
 }
-if (preg_match('/[0-9]/', $apellidos)) {
+if (contieneDigito($apellidos)) {
     redirigirError(1);
 }
 
@@ -49,22 +93,23 @@ if ($email === '') {
 if (
     mb_strlen($email) > 100
     || !filter_var($email, FILTER_VALIDATE_EMAIL)
-    || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/', $email)
+    || !correoTieneFormatoValido($email)
 ) {
     redirigirError(2);
 }
 
 // ---------- Contraseña ----------
-if ($password === '') {
+if ($password === '' || !mb_check_encoding($password, 'UTF-8')) {
     redirigirError(3);
 }
-if (preg_match_all('/\p{L}/u', $password) < 2) {
+[$cantidadLetras, $tieneMayuscula] = analizarLetras($password);
+if ($cantidadLetras < 2) {
     redirigirError(3);
 }
-if (!preg_match('/\p{Lu}/u', $password)) {
+if (!$tieneMayuscula) {
     redirigirError(3);
 }
-if (!preg_match('/[0-9]/', $password)) {
+if (!contieneDigito($password)) {
     redirigirError(3);
 }
 if ($password !== $confirmPassword) {
