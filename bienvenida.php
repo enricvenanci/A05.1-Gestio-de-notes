@@ -155,13 +155,6 @@ function e(?string $valor): string
                                     <td>
                                         <div class="table-actions">
                                             <a class="btn-outline" href="notas.php?idAlumno=<?= (int) $alumno['id'] ?>">Ver notas</a>
-                                            <?php if ($userRole === 'admin'): ?>
-                                                <form method="post" action="proc/proc_alumnos.php"
-                                                      onsubmit="return confirm('¿Eliminar a este alumno y todas sus matrículas?');">
-                                                    <input type="hidden" name="id" value="<?= (int) $alumno['id'] ?>">
-                                                    <button type="submit" class="btn-danger">Eliminar</button>
-                                                </form>
-                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>

@@ -6,6 +6,7 @@ $mensajesError = [
     '4' => 'Las contraseñas no coinciden.',
     '5' => 'Ya existe una cuenta con ese correo electrónico.',
     '6' => 'No se pudo completar el registro. Inténtalo de nuevo.',
+    '7' => 'Selecciona un perfil válido.',
 ];
 $codigoError = isset($_GET['error']) && is_string($_GET['error']) ? $_GET['error'] : '';
 $mensajeError = $mensajesError[$codigoError] ?? '';
@@ -65,7 +66,18 @@ $mensajeError = $mensajesError[$codigoError] ?? '';
                     <span id="error-confirm-password"></span>
                 </div>
 
-                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse como alumno <span aria-hidden="true">→</span></button>
+                <div class="field">
+                    <label for="rol">Rol</label>
+                    <select class="select" id="rol" name="rol" required>
+                        <option value="" selected disabled>Selecciona tu perfil</option>
+                        <option value="admin">Admin</option>
+                        <option value="profesor">Profesor</option>
+                        <option value="educador">Educador</option>
+                        <option value="secretaria">Secretaría</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary btn-block" type="submit" onclick="return validarRegistro()">Registrarse <span aria-hidden="true">→</span></button>
             </form>
 
             <p class="auth-card__foot">

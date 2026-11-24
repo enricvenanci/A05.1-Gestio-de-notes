@@ -17,6 +17,8 @@ $password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST[
 $confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])
     ? $_POST['confirm_password']
     : '';
+$rolesPermitidos = ['profesor', 'educador', 'secretaria', 'admin'];
+$rol = isset($_POST['rol']) && is_string($_POST['rol']) ? $_POST['rol'] : '';
 
 // ---------- Nombre ----------
 if ($nombre === '') {
@@ -69,6 +71,10 @@ if ($password !== $confirmPassword) {
     redirigirError(4);
 }
 
+if (!in_array($rol, $rolesPermitidos, true)) {
+    redirigirError(7);
+}
+
 include '../sql/conexion/conexion.php';
 
 /** @var PDO $conn */
@@ -83,7 +89,7 @@ try {
         'apellidos' => $apellidos,
         'email' => $email,
         'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-        'rol' => 'alumno',
+        'rol' => $rol,
     ]);
 } catch (PDOException $exception) {
     if (($exception->errorInfo[1] ?? null) === 1062) {
