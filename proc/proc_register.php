@@ -1,5 +1,5 @@
 <?php
-function redirigirError(int $codigo): void
+function redirigirError(int $codigo)
 {
     header('Location: ../register.php?error=' . $codigo);
     exit;
@@ -14,9 +14,7 @@ $nombre = isset($_POST['nombre']) && is_string($_POST['nombre']) ? trim($_POST['
 $apellidos = isset($_POST['apellidos']) && is_string($_POST['apellidos']) ? trim($_POST['apellidos']) : '';
 $email = isset($_POST['email']) && is_string($_POST['email']) ? trim($_POST['email']) : '';
 $password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST['password'] : '';
-$confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])
-    ? $_POST['confirm_password']
-    : '';
+$confirmPassword = isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])? $_POST['confirm_password']: '';
 
 // ---------- Nombre ----------
 if ($nombre === '') {

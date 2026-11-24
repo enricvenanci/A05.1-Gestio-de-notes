@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-function volver(int $codigo, int $asignatura = 0): void
+function volver(int $codigo, int $asignatura = 0)
 {
     $url = '../pages/introducir_notas.php?error=' . $codigo;
     if ($asignatura > 0) {
